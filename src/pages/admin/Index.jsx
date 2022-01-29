@@ -1,7 +1,13 @@
-import React from 'react';
+import { useDarkMode } from "context/darkMode";
+import React from "react";
 
 const Admin = () => {
-  return <div>index Admin</div>;
+  const { darkMode } = useDarkMode();
+  return (
+    <div className={`flex h-full w-full bg-gray-${darkMode ? "900" : "50"}`}>
+      coisas
+    </div>
+  );
 };
 
 export default Admin;

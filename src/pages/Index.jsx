@@ -1,7 +1,13 @@
-import React from 'react';
+import { useDarkMode } from "context/darkMode";
+import React from "react";
 
 const Index = () => {
-  return <div>Pagina Index</div>;
+  const { darkMode } = useDarkMode();
+  return (
+    <div className={`flex h-full bg-gray-${darkMode ? "900" : "50"}`}>
+      Pagina Index
+    </div>
+  );
 };
 
 export default Index;

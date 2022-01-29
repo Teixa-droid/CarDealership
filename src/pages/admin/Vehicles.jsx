@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
- import { ToastContainer, toast } from "react-toastify";
- import "react-toastify/dist/ReactToastify.css";
+import React, { useEffect, useState, useRef } from "react";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const vehiclesBackend = [
   {
@@ -73,9 +73,9 @@ const Vehicles = () => {
         <VehiclesTable vehiclesList={vehicles} />
       ) : (
         <VehicleCreationForm
-          functionToShowTable={setshowTable}
+          setShowTable={setshowTable}
           vehiclesList={vehicles}
-          functionToAddVehicle={setVehicles}
+          setVehicles={setVehicles}
         />
       )}
       <ToastContainer position="bottom-center" autoClose={5000} />
@@ -114,50 +114,52 @@ const VehiclesTable = ({ vehiclesList }) => {
   );
 };
 
-const VehicleCreationForm = ({
-  functionToShowTable,
-  vehiclesList,
-  functionToAddVehicle,
-}) => {
-  const [name, setName] = useState();
-  const [brand, setBrand] = useState();
-  const [model, setModel] = useState();
+const VehicleCreationForm = ({ setShowTable, vehiclesList, setVehicles }) => {
+  const form = useRef(null);
 
-  const sendToBackend = () => {
-    console.log("name", name, "brand", brand, "model", model);
-    toast.success("Msg");
-    functionToShowTable(true);
-    functionToAddVehicle([...vehiclesList,{name:name,brand:brand,model:model},
-    ]);
+  const submitForm = (e) => {
+    e.preventDefault();
+    const fd = new FormData(form.current);
+
+    const newVehicle = {};
+    fd.forEach((value, key) => {
+      newVehicle[key] = value;
+    });
+    setShowTable(true);
+    setVehicles([...vehiclesList, newVehicle]);
+    // Mostrar o caso de sucesso e mostrar um toast de sucesso
+    toast.success("vehicle add with success");
+    // Mostrar o caso de erro e mostrar um toast de erro
+    //toast.error('Error to create a vehicle');
   };
+
   return (
     <div className="flex flex-col items-center justify-center">
       <h2 className="text-2xl font-extrabold text-gray-800">
         Create a new Vehicle
       </h2>
-      <form className="flex flex-col">
+      <form ref={form} onSubmit={submitForm} className="flex flex-col">
         <label className="flex flex-col" htmlFor="name">
           vehicle name
           <input
+            name="name"
             className="bg-gray-50 border bourder-gray-600 p-2 rounded-lg m-2"
             type="text"
             placeholder="Corolla"
-            value={name}
-            onChange={(e) => {
-              setName(e.target.value);
-            }}
+            required
           />
         </label>
         <label className="flex flex-col" htmlFor="brand">
           vehicle brand
           <select
-            value={brand}
-            onChange={(e) => {
-              setBrand(e.target.value);
-            }}
-            className="bg-gray-50 border bourder-gray-600 p-2 rounded-lg m-2 name='brand'"
+            className="bg-gray-50 border bourder-gray-600 p-2 rounded-lg m-2"
+            name="brand"
+            required
+            defaultValue={0}
           >
-            <option disabled> Chose an option </option>
+            <option disabled value={0}>
+              Chose an option
+            </option>
             <option>Renault</option>
             <option>Toyota</option>
             <option>Ford</option>
@@ -174,19 +176,13 @@ const VehicleCreationForm = ({
             min={1992}
             max={2022}
             placeholder="2014"
-            value={model}
-            onChange={(e) => {
-              setModel(e.target.value);
-            }}
+            required
           />
         </label>
 
         <button
-          type="button"
+          type="submit"
           className="col-span-2 bg-green-400 p-2 rounded-full shadow-md hover:bg-green-600 text-white"
-          onClick={() => {
-            sendToBackend();
-          }}
         >
           Save vehicle
         </button>
