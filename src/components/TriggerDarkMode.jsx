@@ -4,7 +4,6 @@ import { useDarkMode } from "context/darkMode";
 
 const TriggerDarkMode = () => {
   const { darkMode, setDarkMode } = useDarkMode();
-
   return (
     <button
       onClick={() => {
