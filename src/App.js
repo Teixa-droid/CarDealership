@@ -5,7 +5,7 @@ import PrivateLayout from 'layouts/PrivateLayout';
 import Vehicles from 'pages/admin/Vehicles';
 import Clients from 'pages/admin/Clients';
 import Index from 'pages/Index';
-import Login from 'pages/Login';
+import Login from "pages/auth/Login";
 import Register from 'pages/Register';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import 'styles/styles.css';
