@@ -1,4 +1,4 @@
-import Logo from "components/LogoImage";
+import LogoImage from "components/LogoImage";
 import React from "react";
 import { Link } from "react-router-dom";
 
@@ -11,7 +11,7 @@ const AuthLayout = ({ children }) => {
         </Link>
       </div>
       <div className="max-w-md w-full">
-        <img className="mx-auto h-52 w-auto" src={Logo} alt="workflow" />
+        <LogoImage />
         {children}
       </div>
     </div>

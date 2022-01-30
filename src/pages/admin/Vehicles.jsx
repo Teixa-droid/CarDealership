@@ -1,45 +1,45 @@
-import React, { useEffect, useState, useRef } from "react";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import React, { useEffect, useState, useRef } from 'react';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const vehiclesBackend = [
   {
-    name: "Corolla",
-    brand: "toyota",
-    model: "2014",
+    name: 'Corolla',
+    brand: 'toyota',
+    model: '2014',
   },
   {
-    name: "Corolla",
-    brand: "toyota",
-    model: "2014",
+    name: 'Corolla',
+    brand: 'toyota',
+    model: '2014',
   },
   {
-    name: "Corolla",
-    brand: "toyota",
-    model: "2014",
+    name: 'Corolla',
+    brand: 'toyota',
+    model: '2014',
   },
   {
-    name: "Corolla",
-    brand: "toyota",
-    model: "2014",
+    name: 'Corolla',
+    brand: 'toyota',
+    model: '2014',
   },
   {
-    name: "Corolla",
-    brand: "toyota",
-    model: "2014",
+    name: 'Corolla',
+    brand: 'toyota',
+    model: '2014',
   },
   {
-    name: "Corolla",
-    brand: "toyota",
-    model: "2014",
+    name: 'Corolla',
+    brand: 'toyota',
+    model: '2014',
   },
 ];
 
 const Vehicles = () => {
   const [showTable, setshowTable] = useState(true);
   const [vehicles, setVehicles] = useState([]);
-  const [buttonText, setButtonText] = useState("New vehicle");
-  const [colorButton, setColorButton] = useState("indigo");
+  const [buttonText, setButtonText] = useState('New vehicle');
+  const [colorButton, setColorButton] = useState('indigo');
 
   useEffect(() => {
     setVehicles(vehiclesBackend);
@@ -47,17 +47,17 @@ const Vehicles = () => {
 
   useEffect(() => {
     if (showTable) {
-      setButtonText("Create new vehicle");
-      setColorButton("indigo");
+      setButtonText('Create new vehicle');
+      setColorButton('indigo');
     } else {
-      setButtonText("Show all vehicles");
-      setColorButton("red");
+      setButtonText('Show all vehicles');
+      setColorButton('red');
     }
   }, [showTable]);
   return (
-    <div className="flex h-flex w-full flex-col items-center justify-start p-8">
-      <div className="flex flex-col">
-        <h2 className="text-3xl font-extrabold text-gray-900">
+    <div className='flex h-flex w-full flex-col items-center justify-start p-8'>
+      <div className='flex flex-col'>
+        <h2 className='text-3xl font-extrabold text-gray-900'>
           Pagina de administracao de veiculos
         </h2>
         <button
@@ -78,18 +78,18 @@ const Vehicles = () => {
           setVehicles={setVehicles}
         />
       )}
-      <ToastContainer position="bottom-center" autoClose={5000} />
+      <ToastContainer position='bottom-center' autoClose={5000} />
     </div>
   );
 };
 
 const VehiclesTable = ({ vehiclesList }) => {
   useEffect(() => {
-    console.log("este é a lista de veiculos da table", vehiclesList);
+    console.log('este é a lista de veiculos da table', vehiclesList);
   }, [vehiclesList]);
   return (
-    <div className="flex flex-col items-center justify-center">
-      <h2 className="text-2xl font-extrabold text-gray-900"> </h2>
+    <div className='flex flex-col items-center justify-center'>
+      <h2 className='text-2xl font-extrabold text-gray-900'> </h2>
       <table>
         <thead>
           <tr>
@@ -128,32 +128,32 @@ const VehicleCreationForm = ({ setShowTable, vehiclesList, setVehicles }) => {
     setShowTable(true);
     setVehicles([...vehiclesList, newVehicle]);
     // Mostrar o caso de sucesso e mostrar um toast de sucesso
-    toast.success("vehicle add with success");
+    toast.success('vehicle add with success');
     // Mostrar o caso de erro e mostrar um toast de erro
     //toast.error('Error to create a vehicle');
   };
 
   return (
-    <div className="flex flex-col items-center justify-center">
-      <h2 className="text-2xl font-extrabold text-gray-800">
+    <div className='flex flex-col items-center justify-center'>
+      <h2 className='text-2xl font-extrabold text-gray-800'>
         Create a new Vehicle
       </h2>
-      <form ref={form} onSubmit={submitForm} className="flex flex-col">
-        <label className="flex flex-col" htmlFor="name">
+      <form ref={form} onSubmit={submitForm} className='flex flex-col'>
+        <label className='flex flex-col' htmlFor='name'>
           vehicle name
           <input
-            name="name"
-            className="bg-gray-50 border bourder-gray-600 p-2 rounded-lg m-2"
-            type="text"
-            placeholder="Corolla"
+            name='name'
+            className='bg-gray-50 border bourder-gray-600 p-2 rounded-lg m-2'
+            type='text'
+            placeholder='Corolla'
             required
           />
         </label>
-        <label className="flex flex-col" htmlFor="brand">
+        <label className='flex flex-col' htmlFor='brand'>
           vehicle brand
           <select
-            className="bg-gray-50 border bourder-gray-600 p-2 rounded-lg m-2"
-            name="brand"
+            className='bg-gray-50 border bourder-gray-600 p-2 rounded-lg m-2'
+            name='brand'
             required
             defaultValue={0}
           >
@@ -167,22 +167,22 @@ const VehicleCreationForm = ({ setShowTable, vehiclesList, setVehicles }) => {
             <option>Chevrolet</option>
           </select>
         </label>
-        <label className="flex flex-col" htmlFor="model">
+        <label className='flex flex-col' htmlFor='model'>
           vehicle model
           <input
-            name="model"
-            className="bg-gray-50 border bourder-gray-600 p-2 rounded-lg m-2"
-            type="number"
+            name='model'
+            className='bg-gray-50 border bourder-gray-600 p-2 rounded-lg m-2'
+            type='number'
             min={1992}
             max={2022}
-            placeholder="2014"
+            placeholder='2014'
             required
           />
         </label>
 
         <button
-          type="submit"
-          className="col-span-2 bg-green-400 p-2 rounded-full shadow-md hover:bg-green-600 text-white"
+          type='submit'
+          className='col-span-2 bg-green-400 p-2 rounded-full shadow-md hover:bg-green-600 text-white'
         >
           Save vehicle
         </button>
