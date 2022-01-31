@@ -9,7 +9,7 @@ const SidebarResponsive = () => {
         setShowNavigation(!showNavigation);
       }}
       >
-        <i className={`fas fa-${showNavigation ? 'times' : 'bars'} hover:text-yellow-600`} />
+        <i className={`mx-2 fas fa-${showNavigation ? 'times' : 'bars'} hover:text-yellow-600`} />
         {showNavigation &&
             <ul className="bg-gray-900">
                 <ResponsiveRoute name='Vehicles' route='/admin/vehicles' />
