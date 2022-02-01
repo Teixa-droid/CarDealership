@@ -1,8 +1,9 @@
 import React, { useEffect, useState, useRef } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import axios from "axios";
-import "react-toastify/dist/ReactToastify.css";
 import { nanoid } from "nanoid";
+import { Dialog, Tooltip } from "@material-ui/core";
+import "react-toastify/dist/ReactToastify.css";
 
 const Vehicles = () => {
   const [showTable, setshowTable] = useState(true);
@@ -11,30 +12,29 @@ const Vehicles = () => {
   const [colorButton, setColorButton] = useState("indigo");
   const [executeQuery, setExecuteQuery] = useState(true);
 
+  const getVehicles = async () => {
+    const options = {
+      method: "GET", url: "http://localhost:5000/vehicles " };
+    await axios
+      .request(options)
+      .then(function (response) {
+        setVehicles(response.data);
+      })
+      .catch(function (error) {
+        console.error(error);
+      });
+    setExecuteQuery(false);
+  };
   useEffect(() => {
-    const getVehicles = async () => {
-      const options = {
-        method: "GET",
-        url: "http://localhost:5000/vehicles ",
-      };
-      await axios
-        .request(options)
-        .then(function (response) {
-          setVehicles(response.data);
-        })
-        .catch(function (error) {
-          console.error(error);
-        });
-    };
+    console.log("query",executeQuery);
     if (executeQuery) {
-      getVehicles();
-      setExecuteQuery(false);
+      setExecuteQuery();
     }
   }, [executeQuery]);
 
   useEffect(() => {
     if (showTable) {
-      setExecuteQuery(false);
+      setExecuteQuery(true);
     }
   }, [showTable]);
 
@@ -80,41 +80,71 @@ const Vehicles = () => {
 };
 
 const VehiclesTable = ({ vehiclesList, setExecuteQuery }) => {
+  const [search, setSearch] = useState("");
+  const [filteredVehicles, setFilteredVehicles] = useState(vehiclesList);
+
   useEffect(() => {
-    console.log("este é a lista de veiculos da table", vehiclesList);
-  }, [vehiclesList]);
- 
+    setFilteredVehicles(
+      vehiclesList.filter((element) => {
+        return JSON.stringify(element)
+          .toLowerCase()
+          .includes(search.toLowerCase());
+      })
+    );
+  }, [search, vehiclesList]);
+
   return (
     <div className="flex flex-col items-center justify-center w-full">
+      <input
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        placeholder="Search"
+        className="border-2 border-gray-700 px-3 py-1 self-start rounded-md focus:outline-none focus:border-indigo-500"
+      />
       <h2 className="text-2xl font-extrabold text-gray-800"> All Vehicles </h2>
-
-      <table className="table">
-        <thead>
-          <tr>
-            <th>Vehicle Name</th>
-            <th>Car Brand</th>
-            <th>Car Model</th>
-            <th> Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {vehiclesList.map((vehicle) => {
-            return (
-              <VehicleQueue
-                key={nanoid()}
-                vehicle={vehicle}
-                setExecuteQuery={setExecuteQuery}
-              />
-            );
-          })}
-        </tbody>
-      </table>
+      <div className="hidden md:flex w-full">
+        <table className="table">
+          <thead>
+            <tr>
+              <th>Vehicle Name</th>
+              <th>Car Brand</th>
+              <th>Car Model</th>
+              <th> Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredVehicles.map((vehicle) => {
+              return (
+                <tr>
+                  <VehicleQueue
+                    key={nanoid()}
+                    vehicle={vehicle}
+                    setExecuteQuery={setExecuteQuery}
+                  />
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+      <div className="flex flex-col w-full m-2 md:hidden">
+        {filteredVehicles.map((el) => {
+          return (
+            <div className="bg-gray-400 m-2 shadow-xl flex flex-col p-2 rounded-xl">
+              <span>{el.name}</span>
+              <span>{el.brand}</span>
+              <span>{el.model}</span>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 };
 
 const VehicleQueue = ({ vehicle, setExecuteQuery }) => {
   const [edit, setEdit] = useState(false);
+  const [openDialog, setOpenDialog] = useState(false);
   const [newVehicleInfo, setnewVehicleInfo] = useState({
     name: vehicle.name,
     brand: vehicle.brand,
@@ -163,10 +193,11 @@ const VehicleQueue = ({ vehicle, setExecuteQuery }) => {
         console.error(error);
         toast.error("error");
       });
+    setOpenDialog(false);
   };
 
   return (
-    <tr>
+    <div>
       {edit ? (
         <>
           <td>
@@ -210,23 +241,61 @@ const VehicleQueue = ({ vehicle, setExecuteQuery }) => {
       <td>
         <div className="flex w-full justify-around">
           {edit ? (
-            <i
-              onClick={() => updateVehicle()}
-              className="fas fa-check text-yellow-700 hover:text-green-500"
-            />
+            <>
+              <Tooltip title="Confirm Edition" arrow>
+                <i
+                  onClick={() => updateVehicle()}
+                  className="fas fa-check text-yellow-700 hover:text-green-500"
+                />
+              </Tooltip>
+              <Tooltip title="Cancel Edition" arrow>
+                <i
+                  onClick={() => setEdit(!edit)}
+                  className="fas fa-ban text-yellow-700 hover:text-yellow-500"
+                />
+              </Tooltip>
+            </>
           ) : (
-            <i
-              onClick={() => setEdit(!edit)}
-              className="fas fa-pencil-alt text-yellow-700 hover:text-yellow-500"
-            />
+            <>
+              <Tooltip title="Edit Vehicle" arrow>
+                <i
+                  onClick={() => setEdit(!edit)}
+                  className="fas fa-pencil-alt text-yellow-700 hover:text-yellow-500"
+                />
+              </Tooltip>
+
+              <Tooltip title="Remove Vehicle" arrow>
+                <i
+                  onclick={() => setOpenDialog(true)}
+                  className="fas fa-trash text-red-700 hover:text-red-500"
+                />
+              </Tooltip>
+            </>
           )}
-          <i
-            onclick={() => removeVehicle()}
-            className="fas fa-trash text-red-700 hover:text-red-500"
-          />
         </div>
+        <Dialog open={openDialog}>
+          <div className="p-8 flex flex-col">
+            <h1 className="text-gray-900 text-2xl font-bold">
+              Are you sure you want to eliminate the vehicle?
+            </h1>
+            <div className="flex w-full items-center justify-center my-4">
+              <button
+                onClick={() => removeVehicle}
+                className="mx-2 px-4 py-2 bg-green-500 text-white hover:bg-green-700 rounded-md shadow-md"
+              >
+                yes
+              </button>
+              <button
+                onClick={() => setOpenDialog(false)}
+                className="mx-2 px-4 py-2 bg-red-500 text-white hover:bg-red-700 rounded-md shadow-md"
+              >
+                no
+              </button>
+            </div>
+          </div>
+        </Dialog>
       </td>
-    </tr>
+    </div>
   );
 };
 
