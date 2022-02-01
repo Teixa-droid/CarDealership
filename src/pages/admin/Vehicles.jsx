@@ -2,16 +2,21 @@ import React, { useEffect, useState, useRef } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import axios from "axios";
 import "react-toastify/dist/ReactToastify.css";
+import { nanoid } from "nanoid";
 
 const Vehicles = () => {
   const [showTable, setshowTable] = useState(true);
   const [vehicles, setVehicles] = useState([]);
   const [buttonText, setButtonText] = useState("New vehicle");
   const [colorButton, setColorButton] = useState("indigo");
+  const [executeQuery, setExecuteQuery] = useState(true);
 
   useEffect(() => {
     const getVehicles = async () => {
-      const options = { method: "GET", url: "https://vast-waters-45728.herokuapp.com/vehicle/ "};
+      const options = {
+        method: "GET",
+        url: "http://localhost:5000/vehicles ",
+      };
       await axios
         .request(options)
         .then(function (response) {
@@ -21,8 +26,15 @@ const Vehicles = () => {
           console.error(error);
         });
     };
-    if (showTable) {
+    if (executeQuery) {
       getVehicles();
+      setExecuteQuery(false);
+    }
+  }, [executeQuery]);
+
+  useEffect(() => {
+    if (showTable) {
+      setExecuteQuery(false);
     }
   }, [showTable]);
 
@@ -36,8 +48,8 @@ const Vehicles = () => {
     }
   }, [showTable]);
   return (
-    <div className="flex h-flex w-full flex-col items-center justify-start p-8">
-      <div className="flex flex-col">
+    <div className="flex h-full w-full flex-col items-center justify-start p-8">
+      <div className="flex flex-col w-full">
         <h2 className="text-3xl font-extrabold text-gray-900">
           Pagina de administracao de veiculos
         </h2>
@@ -51,7 +63,10 @@ const Vehicles = () => {
         </button>
       </div>
       {showTable ? (
-        <VehiclesTable vehiclesList={vehicles} />
+        <VehiclesTable
+          vehiclesList={vehicles}
+          setExecuteQuery={setExecuteQuery}
+        />
       ) : (
         <VehicleCreationForm
           setShowTable={setshowTable}
@@ -64,34 +79,154 @@ const Vehicles = () => {
   );
 };
 
-const VehiclesTable = ({ vehiclesList }) => {
+const VehiclesTable = ({ vehiclesList, setExecuteQuery }) => {
   useEffect(() => {
     console.log("este é a lista de veiculos da table", vehiclesList);
   }, [vehiclesList]);
+ 
   return (
-    <div className="flex flex-col items-center justify-center">
-      <h2 className="text-2xl font-extrabold text-gray-900"> </h2>
-      <table>
+    <div className="flex flex-col items-center justify-center w-full">
+      <h2 className="text-2xl font-extrabold text-gray-800"> All Vehicles </h2>
+
+      <table className="table">
         <thead>
           <tr>
             <th>Vehicle Name</th>
             <th>Car Brand</th>
             <th>Car Model</th>
+            <th> Actions</th>
           </tr>
         </thead>
         <tbody>
           {vehiclesList.map((vehicle) => {
             return (
-              <tr>
-                <td>{vehicle.name}</td>
-                <td>{vehicle.brand}</td>
-                <td>{vehicle.model}</td>
-              </tr>
+              <VehicleQueue
+                key={nanoid()}
+                vehicle={vehicle}
+                setExecuteQuery={setExecuteQuery}
+              />
             );
           })}
         </tbody>
       </table>
     </div>
+  );
+};
+
+const VehicleQueue = ({ vehicle, setExecuteQuery }) => {
+  const [edit, setEdit] = useState(false);
+  const [newVehicleInfo, setnewVehicleInfo] = useState({
+    name: vehicle.name,
+    brand: vehicle.brand,
+    model: vehicle.model,
+  });
+
+  const updateVehicle = async () => {
+    console.log(newVehicleInfo);
+    const options = {
+      method: "PATCH",
+      url: "http://localhost:5000/vehicles/update",
+      headers: { "Content-Type": "application/json" },
+      data: { ...newVehicleInfo, id: vehicle._id },
+    };
+
+    await axios
+      .request(options)
+      .then(function (response) {
+        console.log(response.data);
+        toast.success("success update");
+        setEdit(false);
+        setExecuteQuery(true);
+      })
+      .catch(function (error) {
+        toast.error("update erro");
+        console.error(error);
+      });
+  };
+
+  const removeVehicle = async () => {
+    const options = {
+      method: "DELETE",
+      url: "http://localhost:5000/vehicles/delete",
+      headers: { "Content-Type": "application/json" },
+      data: { id: vehicle._id },
+    };
+
+    await axios
+      .request(options)
+      .then(function (response) {
+        console.log(response.data);
+        toast.success("vehicle eliminated with success");
+        setExecuteQuery(true);
+      })
+      .catch(function (error) {
+        console.error(error);
+        toast.error("error");
+      });
+  };
+
+  return (
+    <tr>
+      {edit ? (
+        <>
+          <td>
+            <input
+              className="bg-gray-50 border border-gray-600 p-2 rounded-lg m-2"
+              type="text"
+              value={newVehicleInfo.name}
+              onChange={(e) =>
+                setnewVehicleInfo({ ...newVehicleInfo, name: e.target.value })
+              }
+            />
+          </td>
+          <td>
+            <input
+              className="bg-gray-50 border border-gray-600 p-2 rounded-lg m-2"
+              type="text"
+              value={newVehicleInfo.brand}
+              onChange={(e) =>
+                setnewVehicleInfo({ ...newVehicleInfo, brand: e.target.value })
+              }
+            />
+          </td>
+          <td>
+            <input
+              className="bg-gray-50 border border-gray-600 p-2 rounded-lg m-2"
+              type="text"
+              value={newVehicleInfo.model}
+              onChange={(e) =>
+                setnewVehicleInfo({ ...newVehicleInfo, model: e.target.value })
+              }
+            />
+          </td>
+        </>
+      ) : (
+        <>
+          <td>{vehicle.name}</td>
+          <td>{vehicle.brand}</td>
+          <td>{vehicle.model}</td>
+        </>
+      )}
+      <td>
+        <div className="flex w-full justify-around">
+          {edit ? (
+            <i
+              onClick={() => updateVehicle()}
+              className="fas fa-check text-yellow-700 hover:text-green-500"
+            />
+          ) : (
+            <i
+              onClick={() => setEdit(!edit)}
+              className="fas fa-pencil-alt text-yellow-700 hover:text-yellow-500"
+            />
+          )}
+          <i
+            onclick={() => removeVehicle()}
+            className="fas fa-trash text-red-700 hover:text-red-500"
+          />
+        </div>
+      </td>
+    </tr>
   );
 };
 
@@ -142,7 +277,7 @@ const VehicleCreationForm = ({ setShowTable, vehiclesList, setVehicles }) => {
           vehicle name
           <input
             name="name"
-            className="bg-gray-50 border bourder-gray-600 p-2 rounded-lg m-2"
+            className="bg-gray-50 border border-gray-600 p-2 rounded-lg m-2"
             type="text"
             placeholder="Corolla"
             required
@@ -151,7 +286,7 @@ const VehicleCreationForm = ({ setShowTable, vehiclesList, setVehicles }) => {
         <label className="flex flex-col" htmlFor="brand">
           vehicle brand
           <select
-            className="bg-gray-50 border bourder-gray-600 p-2 rounded-lg m-2"
+            className="bg-gray-50 border border-gray-600 p-2 rounded-lg m-2"
             name="brand"
             required
             defaultValue={0}
@@ -170,7 +305,7 @@ const VehicleCreationForm = ({ setShowTable, vehiclesList, setVehicles }) => {
           vehicle model
           <input
             name="model"
-            className="bg-gray-50 border bourder-gray-600 p-2 rounded-lg m-2"
+            className="bg-gray-50 border border-gray-600 p-2 rounded-lg m-2"
             type="number"
             min={1992}
             max={2022}

@@ -24,11 +24,12 @@ const Route = ({ icon, route, name }) => {
   const isActive = useActiveRoute(route);
   return (
     <Link to={route}>
-      <button className={`p-1 my-2 bg-${
-        isActive ? 'indigo' : 'gray'
-    }-700 hover:bg-indigo-900 flex w-full items-center text-white rounded-md`}
-    >        
-      <i className={`${icon} w-10`} />
+      <button
+        className={`p-1 my-2 bg-${
+          isActive ? 'indigo' : 'gray'
+        }-700 hover:bg-indigo-900 flex w-full items-center text-white rounded-md`}
+      >
+        <i className={`${icon} w-10`} />
         {name}
       </button>
     </Link>
