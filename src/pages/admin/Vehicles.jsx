@@ -3,6 +3,7 @@ import { ToastContainer, toast } from "react-toastify";
 import axios from "axios";
 import { nanoid } from "nanoid";
 import { Dialog, Tooltip } from "@material-ui/core";
+import { getVehicles } from 'utils/api';
 import "react-toastify/dist/ReactToastify.css";
 
 const Vehicles = () => {
@@ -12,23 +13,10 @@ const Vehicles = () => {
   const [colorButton, setColorButton] = useState("indigo");
   const [executeQuery, setExecuteQuery] = useState(true);
 
-  const getVehicles = async () => {
-    const options = {
-      method: "GET", url: "http://localhost:5000/vehicles " };
-    await axios
-      .request(options)
-      .then(function (response) {
-        setVehicles(response.data);
-      })
-      .catch(function (error) {
-        console.error(error);
-      });
-    setExecuteQuery(false);
-  };
   useEffect(() => {
     console.log("query",executeQuery);
     if (executeQuery) {
-      setExecuteQuery();
+      getVehicles(setVehicles, setExecuteQuery);
     }
   }, [executeQuery]);
 
