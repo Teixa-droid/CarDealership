@@ -3,7 +3,7 @@ import axios from "axios";
 export const getVehicles = async (setVehicles, setExecuteQuery) => {
   const options = {
     method: "GET",
-    url: "http://localhost:5000/vehicles ",
+    url: "http://localhost:5000/vehicles/",
   };
   await axios
     .request(options)

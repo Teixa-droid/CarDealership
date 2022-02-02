@@ -3,7 +3,7 @@ import { ToastContainer, toast } from "react-toastify";
 import axios from "axios";
 import { nanoid } from "nanoid";
 import { Dialog, Tooltip } from "@material-ui/core";
-import { getVehicles } from 'utils/api';
+import { getVehicles } from "utils/api";
 import "react-toastify/dist/ReactToastify.css";
 
 const Vehicles = () => {
@@ -14,7 +14,7 @@ const Vehicles = () => {
   const [executeQuery, setExecuteQuery] = useState(true);
 
   useEffect(() => {
-    console.log("query",executeQuery);
+    console.log("query", executeQuery);
     if (executeQuery) {
       getVehicles(setVehicles, setExecuteQuery);
     }
@@ -94,6 +94,7 @@ const VehiclesTable = ({ vehiclesList, setExecuteQuery }) => {
         <table className="table">
           <thead>
             <tr>
+              <th>Id</th>
               <th>Vehicle Name</th>
               <th>Car Brand</th>
               <th>Car Model</th>
@@ -103,13 +104,11 @@ const VehiclesTable = ({ vehiclesList, setExecuteQuery }) => {
           <tbody>
             {filteredVehicles.map((vehicle) => {
               return (
-                <tr>
-                  <VehicleQueue
-                    key={nanoid()}
-                    vehicle={vehicle}
-                    setExecuteQuery={setExecuteQuery}
-                  />
-                </tr>
+                <VehicleQueue
+                  key={nanoid()}
+                  vehicle={vehicle}
+                  setExecuteQuery={setExecuteQuery}
+                />
               );
             })}
           </tbody>
@@ -134,16 +133,16 @@ const VehicleQueue = ({ vehicle, setExecuteQuery }) => {
   const [edit, setEdit] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
   const [newVehicleInfo, setnewVehicleInfo] = useState({
+    _id: vehicle.id,
     name: vehicle.name,
     brand: vehicle.brand,
     model: vehicle.model,
   });
 
   const updateVehicle = async () => {
-    console.log(newVehicleInfo);
     const options = {
       method: "PATCH",
-      url: "http://localhost:5000/vehicles/update",
+      url: "http://localhost:5000/vehicles/edit/",
       headers: { "Content-Type": "application/json" },
       data: { ...newVehicleInfo, id: vehicle._id },
     };
@@ -165,7 +164,7 @@ const VehicleQueue = ({ vehicle, setExecuteQuery }) => {
   const removeVehicle = async () => {
     const options = {
       method: "DELETE",
-      url: "http://localhost:5000/vehicles/delete",
+      url: "http://localhost:5000/vehicles/delete/",
       headers: { "Content-Type": "application/json" },
       data: { id: vehicle._id },
     };
@@ -188,6 +187,7 @@ const VehicleQueue = ({ vehicle, setExecuteQuery }) => {
     <div>
       {edit ? (
         <>
+          <td>{newVehicleInfo._id}</td>
           <td>
             <input
               className="bg-gray-50 border border-gray-600 p-2 rounded-lg m-2"
@@ -221,6 +221,7 @@ const VehicleQueue = ({ vehicle, setExecuteQuery }) => {
         </>
       ) : (
         <>
+          <td>{vehicle._id.slice(20)}</td>
           <td>{vehicle.name}</td>
           <td>{vehicle.brand}</td>
           <td>{vehicle.model}</td>
@@ -301,7 +302,7 @@ const VehicleCreationForm = ({ setShowTable, vehiclesList, setVehicles }) => {
 
     const options = {
       method: "POST",
-      url: "https://vast-waters-45728.herokuapp.com/vehicle/create",
+      url: "http://localhost:5000/vehicles/new/",
       Headers: { "Content-Type": "application/json" },
       data: {
         name: newVehicle.name,
