@@ -2,17 +2,17 @@ import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router';
 
 
-const useActiveRoute = (route) => {
+const useActiveRoute = (rota) => {
   const location = useLocation();
   const [isActive, setIsActive] = useState(false);
 
   useEffect(() => {
-    if (location.pathname.includes(route)) {
+    if (location.pathname.includes(rota)) {
       setIsActive(true);
     } else {
       setIsActive(false);
     }
-  }, [location, route]);
+  }, [location, rota]);
 
   return isActive;
 };

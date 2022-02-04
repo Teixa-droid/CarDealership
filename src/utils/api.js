@@ -1,10 +1,58 @@
 import axios from "axios";
 
-export const getVehicles = async (setVehicles, setExecuteQuery) => {
+export const getVehicles = async (successCallback, errorCallback) => {
+  const options = { method: "GET", url: "http://localhost:5000/vehicles/" };
+  await axios.request(options).then(successCallback).catch(errorCallback);
+};
+
+export const createVehicle = async (data, successCallback, errorCallback) => {
   const options = {
-    method: "GET",
+    method: "POST",
     url: "http://localhost:5000/vehicles/",
+    headers: { "Content-Type": "application/json" },
+    data,
   };
+  await axios.request(options).then(successCallback).catch(errorCallback);
+};
+
+export const editVehicle = async (id, data, successCallback, errorCallback) => {
+  const options = {
+    method: "PATCH",
+    url: `http://localhost:5000/vehicles/${id}/`,
+    headers: { "Content-Type": "application/json" },
+    data,
+  };
+  await axios.request(options).then(successCallback).catch(errorCallback);
+};
+
+export const removeVehicle = async (id, successCallback, errorCallback) => {
+  const options = {
+    method: "DELETE",
+    url: `http://localhost:5000/vehicles/${id}/`,
+    headers: { "Content-Type": "application/json" },
+  };
+  await axios.request(options).then(successCallback).catch(errorCallback);
+};
+
+// CRUD FOR USERS
+
+export const getUsers = async (successCallback, errorCallback) => {
+  const options = { method: "GET", url: "http://localhost:5000/users" };
+  await axios.request(options).then(successCallback).catch(errorCallback);
+};
+
+export const createSaller = async (data, successCallback, errorCallback) => {
+  const options = {
+    method: "POST",
+    url: "http://localhost:5000/sales",
+    headers: { "Content-Type": "application/json" },
+    data,
+  };
+  await axios.request(options).then(successCallback).catch(errorCallback);
+};
+/* 
+export const getUsers = async (setVehicles, setExecuteQuery = () => {}) => {
+  const options = { method: "GET", url: "http://localhost:5000/users/" };
   await axios
     .request(options)
     .then(function (response) {
@@ -15,3 +63,4 @@ export const getVehicles = async (setVehicles, setExecuteQuery) => {
     });
   setExecuteQuery(false);
 };
+ */

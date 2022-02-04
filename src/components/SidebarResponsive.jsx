@@ -12,18 +12,18 @@ const SidebarResponsive = () => {
         <i className={`mx-2 fas fa-${showNavigation ? 'times' : 'bars'} hover:text-yellow-600`} />
         {showNavigation &&
             <ul className="bg-gray-900">
-                <ResponsiveRoute name='Vehicles' route='/admin/vehicles' />
-                <ResponsiveRoute name='Sails' route='/admin/sails' />
-                <ResponsiveRoute name='Users' route='/admin/users' />
+                <ResponsiveRoute name='Vehicles' rota='/admin/vehicles' />
+                <ResponsiveRoute name='Sails' rota='/admin/sails' />
+                <ResponsiveRoute name='Users' rota='/admin/users' />
             </ul>
         }
       </div>
   );
 };
 
-const ResponsiveRoute = ({ route, name }) => {
+const ResponsiveRoute = ({ rota, name }) => {
     return (
-        <Link to={route}>
+        <Link to={rota}>
         <li className="text-gray-200 border border-gray-300 p-1">{name}</li>
         </Link>
     );

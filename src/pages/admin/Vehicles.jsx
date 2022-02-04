@@ -1,22 +1,34 @@
 import React, { useEffect, useState, useRef } from "react";
 import { ToastContainer, toast } from "react-toastify";
-import axios from "axios";
 import { nanoid } from "nanoid";
 import { Dialog, Tooltip } from "@material-ui/core";
-import { getVehicles } from "utils/api";
+import {
+  getVehicles,
+  createVehicle,
+  editVehicle,
+  removeVehicle
+} from "utils/api";
 import "react-toastify/dist/ReactToastify.css";
 
 const Vehicles = () => {
   const [showTable, setshowTable] = useState(true);
   const [vehicles, setVehicles] = useState([]);
-  const [buttonText, setButtonText] = useState("New vehicle");
+  const [buttonText, setButtonText] = useState("Create new vehicle");
   const [colorButton, setColorButton] = useState("indigo");
   const [executeQuery, setExecuteQuery] = useState(true);
 
   useEffect(() => {
     console.log("query", executeQuery);
     if (executeQuery) {
-      getVehicles(setVehicles, setExecuteQuery);
+      getVehicles(
+        (response) => {
+          setVehicles(response.data);
+        },
+        (error) => {
+          console.log(error);
+        }
+      );
+      setExecuteQuery(false);
     }
   }, [executeQuery]);
 
@@ -32,7 +44,7 @@ const Vehicles = () => {
       setColorButton("indigo");
     } else {
       setButtonText("Show all vehicles");
-      setColorButton("red");
+      setColorButton("green");
     }
   }, [showTable]);
   return (
@@ -57,7 +69,7 @@ const Vehicles = () => {
         />
       ) : (
         <VehicleCreationForm
-          setShowTable={setshowTable}
+          setshowTable={setshowTable}
           vehiclesList={vehicles}
           setVehicles={setVehicles}
         />
@@ -89,7 +101,7 @@ const VehiclesTable = ({ vehiclesList, setExecuteQuery }) => {
         placeholder="Search"
         className="border-2 border-gray-700 px-3 py-1 self-start rounded-md focus:outline-none focus:border-indigo-500"
       />
-      <h2 className="text-2xl font-extrabold text-gray-800"> All Vehicles </h2>
+      <h2 className="text-2xl font-extrabold text-gray-800">All vehicles</h2>
       <div className="hidden md:flex w-full">
         <table className="table">
           <thead>
@@ -98,7 +110,7 @@ const VehiclesTable = ({ vehiclesList, setExecuteQuery }) => {
               <th>Vehicle Name</th>
               <th>Car Brand</th>
               <th>Car Model</th>
-              <th> Actions</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -132,59 +144,52 @@ const VehiclesTable = ({ vehiclesList, setExecuteQuery }) => {
 const VehicleQueue = ({ vehicle, setExecuteQuery }) => {
   const [edit, setEdit] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
-  const [newVehicleInfo, setnewVehicleInfo] = useState({
-    _id: vehicle.id,
+  const [newVehicleInfo, setNewVehicleInfo] = useState({
+    _id: vehicle._id,
     name: vehicle.name,
     brand: vehicle.brand,
     model: vehicle.model,
   });
 
-  const updateVehicle = async () => {
-    const options = {
-      method: "PATCH",
-      url: "http://localhost:5000/vehicles/edit/",
-      headers: { "Content-Type": "application/json" },
-      data: { ...newVehicleInfo, id: vehicle._id },
-    };
-
-    await axios
-      .request(options)
-      .then(function (response) {
+  const updataVehicle = async () => {
+    await editVehicle(
+      vehicle._id,
+      {
+        name: newVehicleInfo.name,
+        brand: newVehicleInfo.brand,
+        model: newVehicleInfo.model,
+      },
+      (response) => {
         console.log(response.data);
-        toast.success("success update");
+        toast.success("Vehicle successfully modified");
         setEdit(false);
         setExecuteQuery(true);
-      })
-      .catch(function (error) {
-        toast.error("update erro");
+      },
+      (error) => {
+        toast.error("Error modifying the vehicle");
         console.error(error);
-      });
+      }
+    );
   };
 
-  const removeVehicle = async () => {
-    const options = {
-      method: "DELETE",
-      url: "http://localhost:5000/vehicles/delete/",
-      headers: { "Content-Type": "application/json" },
-      data: { id: vehicle._id },
-    };
-
-    await axios
-      .request(options)
-      .then(function (response) {
+  const deleteVehicle = async () => {
+    await removeVehicle(
+      vehicle._id,
+      (response) => {
         console.log(response.data);
-        toast.success("vehicle eliminated with success");
+        toast.success("vehicle successfully removed");
         setExecuteQuery(true);
-      })
-      .catch(function (error) {
+      },
+      (error) => {
         console.error(error);
-        toast.error("error");
-      });
+        toast.error("Error eliminating the vehicle");
+      }
+    );
     setOpenDialog(false);
   };
 
   return (
-    <div>
+    <tr>
       {edit ? (
         <>
           <td>{newVehicleInfo._id}</td>
@@ -194,7 +199,10 @@ const VehicleQueue = ({ vehicle, setExecuteQuery }) => {
               type="text"
               value={newVehicleInfo.name}
               onChange={(e) =>
-                setnewVehicleInfo({ ...newVehicleInfo, name: e.target.value })
+                setNewVehicleInfo({
+                  ...newVehicleInfo,
+                  name: e.target.value,
+                })
               }
             />
           </td>
@@ -204,7 +212,10 @@ const VehicleQueue = ({ vehicle, setExecuteQuery }) => {
               type="text"
               value={newVehicleInfo.brand}
               onChange={(e) =>
-                setnewVehicleInfo({ ...newVehicleInfo, brand: e.target.value })
+                setNewVehicleInfo({
+                  ...newVehicleInfo,
+                  brand: e.target.value,
+                })
               }
             />
           </td>
@@ -214,7 +225,10 @@ const VehicleQueue = ({ vehicle, setExecuteQuery }) => {
               type="text"
               value={newVehicleInfo.model}
               onChange={(e) =>
-                setnewVehicleInfo({ ...newVehicleInfo, model: e.target.value })
+                setNewVehicleInfo({
+                  ...newVehicleInfo,
+                  model: e.target.value,
+                })
               }
             />
           </td>
@@ -231,13 +245,13 @@ const VehicleQueue = ({ vehicle, setExecuteQuery }) => {
         <div className="flex w-full justify-around">
           {edit ? (
             <>
-              <Tooltip title="Confirm Edition" arrow>
+              <Tooltip title="Confirmar Edición" arrow>
                 <i
-                  onClick={() => updateVehicle()}
-                  className="fas fa-check text-yellow-700 hover:text-green-500"
+                  onClick={() => updataVehicle()}
+                  className="fas fa-check text-green-700 hover:text-green-500"
                 />
               </Tooltip>
-              <Tooltip title="Cancel Edition" arrow>
+              <Tooltip title="Cancelar edición" arrow>
                 <i
                   onClick={() => setEdit(!edit)}
                   className="fas fa-ban text-yellow-700 hover:text-yellow-500"
@@ -246,16 +260,15 @@ const VehicleQueue = ({ vehicle, setExecuteQuery }) => {
             </>
           ) : (
             <>
-              <Tooltip title="Edit Vehicle" arrow>
+              <Tooltip title="Editar Vehículo" arrow>
                 <i
                   onClick={() => setEdit(!edit)}
                   className="fas fa-pencil-alt text-yellow-700 hover:text-yellow-500"
                 />
               </Tooltip>
-
-              <Tooltip title="Remove Vehicle" arrow>
+              <Tooltip title="Eliminar Vehículo" arrow>
                 <i
-                  onclick={() => setOpenDialog(true)}
+                  onClick={() => setOpenDialog(true)}
                   className="fas fa-trash text-red-700 hover:text-red-500"
                 />
               </Tooltip>
@@ -265,30 +278,30 @@ const VehicleQueue = ({ vehicle, setExecuteQuery }) => {
         <Dialog open={openDialog}>
           <div className="p-8 flex flex-col">
             <h1 className="text-gray-900 text-2xl font-bold">
-              Are you sure you want to eliminate the vehicle?
+              Are you sure you want to remove the vehicle?
             </h1>
             <div className="flex w-full items-center justify-center my-4">
               <button
-                onClick={() => removeVehicle}
+                onClick={() => deleteVehicle()}
                 className="mx-2 px-4 py-2 bg-green-500 text-white hover:bg-green-700 rounded-md shadow-md"
               >
-                yes
+                Yes
               </button>
               <button
                 onClick={() => setOpenDialog(false)}
                 className="mx-2 px-4 py-2 bg-red-500 text-white hover:bg-red-700 rounded-md shadow-md"
               >
-                no
+                No
               </button>
             </div>
           </div>
         </Dialog>
       </td>
-    </div>
+    </tr>
   );
 };
 
-const VehicleCreationForm = ({ setShowTable, vehiclesList, setVehicles }) => {
+const VehicleCreationForm = ({ setshowTable, vehiclesList, setVehicles }) => {
   const form = useRef(null);
 
   const submitForm = async (e) => {
@@ -300,10 +313,26 @@ const VehicleCreationForm = ({ setShowTable, vehiclesList, setVehicles }) => {
       newVehicle[key] = value;
     });
 
-    const options = {
+    await createVehicle(
+      {
+        name: newVehicle.name,
+        brand: newVehicle.brand,
+        model: newVehicle.model,
+      },
+      (response) => {
+        console.log(response.data);
+        toast.success("Vehicle successfully added");
+      },
+      (error) => {
+        console.error(error);
+        toast.error("Error creating a vehicle");
+      }
+    );
+
+    /*  const options = {
       method: "POST",
       url: "http://localhost:5000/vehicles/new/",
-      Headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json" },
       data: {
         name: newVehicle.name,
         brand: newVehicle.brand,
@@ -315,24 +344,24 @@ const VehicleCreationForm = ({ setShowTable, vehiclesList, setVehicles }) => {
       .request(options)
       .then(function (response) {
         console.log(response.data);
-        toast.success("vehicle add with success");
+        toast.success("Vehicle successfully added");
       })
       .catch(function (error) {
         console.error(error);
-        toast.error("Error to create a vehicle");
-      });
+        toast.error("Error creating a vehicle");
+      });*/
 
-    setShowTable(true);
+    setshowTable(true);
   };
 
   return (
     <div className="flex flex-col items-center justify-center">
       <h2 className="text-2xl font-extrabold text-gray-800">
-        Create a new Vehicle
+        Create new vehicle
       </h2>
       <form ref={form} onSubmit={submitForm} className="flex flex-col">
         <label className="flex flex-col" htmlFor="name">
-          vehicle name
+          Vehicle name
           <input
             name="name"
             className="bg-gray-50 border border-gray-600 p-2 rounded-lg m-2"
@@ -342,7 +371,7 @@ const VehicleCreationForm = ({ setShowTable, vehiclesList, setVehicles }) => {
           />
         </label>
         <label className="flex flex-col" htmlFor="brand">
-          vehicle brand
+          Vehicle brand
           <select
             className="bg-gray-50 border border-gray-600 p-2 rounded-lg m-2"
             name="brand"
@@ -350,7 +379,7 @@ const VehicleCreationForm = ({ setShowTable, vehiclesList, setVehicles }) => {
             defaultValue={0}
           >
             <option disabled value={0}>
-              Chose an option
+              Select an option
             </option>
             <option>Renault</option>
             <option>Toyota</option>
@@ -360,7 +389,7 @@ const VehicleCreationForm = ({ setShowTable, vehiclesList, setVehicles }) => {
           </select>
         </label>
         <label className="flex flex-col" htmlFor="model">
-          vehicle model
+          Vehicle brand
           <input
             name="model"
             className="bg-gray-50 border border-gray-600 p-2 rounded-lg m-2"
@@ -376,7 +405,7 @@ const VehicleCreationForm = ({ setShowTable, vehiclesList, setVehicles }) => {
           type="submit"
           className="col-span-2 bg-green-400 p-2 rounded-full shadow-md hover:bg-green-600 text-white"
         >
-          Save vehicle
+          Save
         </button>
       </form>
     </div>
