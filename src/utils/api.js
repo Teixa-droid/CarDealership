@@ -1,15 +1,15 @@
-import axios from "axios";
+import axios from 'axios';
 
 export const getVehicles = async (successCallback, errorCallback) => {
-  const options = { method: "GET", url: "http://localhost:5000/vehicles/" };
+  const options = { method: 'GET', url: 'http://localhost:5000/vehicles/' };
   await axios.request(options).then(successCallback).catch(errorCallback);
 };
 
 export const createVehicle = async (data, successCallback, errorCallback) => {
   const options = {
-    method: "POST",
-    url: "http://localhost:5000/vehicles/",
-    headers: { "Content-Type": "application/json" },
+    method: 'POST',
+    url: 'http://localhost:5000/vehicles/',
+    headers: { 'Content-Type': 'application/json' },
     data,
   };
   await axios.request(options).then(successCallback).catch(errorCallback);
@@ -17,9 +17,9 @@ export const createVehicle = async (data, successCallback, errorCallback) => {
 
 export const editVehicle = async (id, data, successCallback, errorCallback) => {
   const options = {
-    method: "PATCH",
+    method: 'PATCH',
     url: `http://localhost:5000/vehicles/${id}/`,
-    headers: { "Content-Type": "application/json" },
+    headers: { 'Content-Type': 'application/json' },
     data,
   };
   await axios.request(options).then(successCallback).catch(errorCallback);
@@ -27,9 +27,9 @@ export const editVehicle = async (id, data, successCallback, errorCallback) => {
 
 export const removeVehicle = async (id, successCallback, errorCallback) => {
   const options = {
-    method: "DELETE",
+    method: 'DELETE',
     url: `http://localhost:5000/vehicles/${id}/`,
-    headers: { "Content-Type": "application/json" },
+    headers: { 'Content-Type': 'application/json' },
   };
   await axios.request(options).then(successCallback).catch(errorCallback);
 };
@@ -37,22 +37,22 @@ export const removeVehicle = async (id, successCallback, errorCallback) => {
 // CRUD FOR USERS
 
 export const getUsers = async (successCallback, errorCallback) => {
-  const options = { method: "GET", url: "http://localhost:5000/users" };
+  const options = { method: 'GET', url: 'http://localhost:5000/users' };
   await axios.request(options).then(successCallback).catch(errorCallback);
 };
 
 export const createSaller = async (data, successCallback, errorCallback) => {
   const options = {
-    method: "POST",
-    url: "http://localhost:5000/sales",
-    headers: { "Content-Type": "application/json" },
+    method: 'POST',
+    url: 'http://localhost:5000/sales',
+    headers: { 'Content-Type': 'application/json' },
     data,
   };
   await axios.request(options).then(successCallback).catch(errorCallback);
 };
 /* 
 export const getUsers = async (setVehicles, setExecuteQuery = () => {}) => {
-  const options = { method: "GET", url: "http://localhost:5000/users/" };
+  const options = { method: 'GET', url: 'http://localhost:5000/users/' };
   await axios
     .request(options)
     .then(function (response) {
