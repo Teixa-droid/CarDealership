@@ -8,6 +8,7 @@ const Sales = () => {
   const form = useRef(null);
   const [sellers, setSellers] = useState([]);
   const [vehicles, setVehicles] = useState([]);
+  const [vehiclesTable, setvehiclesTable] = useState([]);
 
   useEffect(() => {
     const fetchSellers = async () => {
@@ -36,8 +37,6 @@ const Sales = () => {
     fetchVehicles();
   }, []);
 
-
-
   const submitForm = async (e) => {
     e.preventDefault();
     const fd = new FormData(form.current);
@@ -49,6 +48,43 @@ const Sales = () => {
 
     console.log("form data", formData);
 
+    const listVehicles = Object.keys(formData)
+      .map((k) => {
+        if (k.includes("vehicle")) {
+          return vehiclesTable.filter((v) => v._id === formData[k])[0];
+        }
+        return null;
+      })
+      .filter((v) => v);
+
+    console.log("lista antes de quantity", listVehicles);
+
+    Object.keys(formData).forEach((k) => {
+      if (k.includes("quantity")) {
+        const indice = parseInt(k.split("_")[1]);
+        listVehicles[indice]["quantity"] = formData[k];
+      }
+    });
+
+    console.log("lista despues de quantity", listVehicles);
+
+    const dataSales = {
+      seller: sellers.filter((v) => v._id === formData.seller)[0],
+      quantity: formData.value,
+      vehicles: listVehicles,
+    };
+
+    console.log("lista vehicles", listVehicles);
+
+    await createSaller(
+      dataSales,
+      (response) => {
+        console.log(response);
+      },
+      (error) => {
+        console.error(error);
+      }
+    );
   };
 
   return (
@@ -61,7 +97,7 @@ const Sales = () => {
           <span className="text-2xl font-gray-900">Seller</span>
           <select name="seller" className="p-2" defaultValue="" required>
             <option disabled value="">
-              Create a new sale
+              Select Seller
             </option>
             {sellers.map((el) => {
               return (
@@ -74,9 +110,14 @@ const Sales = () => {
           </select>
         </label>
 
-        <VehiclesTable vehicles={vehicles} setVehicles={setVehicles}/>
+        <VehiclesTable
+          vehicles={vehicles}
+          setVehicles={setVehicles}
+          setvehiclesTable={setvehiclesTable}
+        />
+
         <label className="flex flex-col">
-          <span className="text-2xl font-gray-900">Valor Total Venta</span>
+          <span className="text-2xl font-gray-900">Total</span>
           <input
             className="bg-gray-50 border border-gray-600 p-2 rounded-lg m-2"
             type="number"
@@ -95,20 +136,22 @@ const Sales = () => {
   );
 };
 
-const VehiclesTable = ({ vehicles, setVehicles }) => {
+const VehiclesTable = ({ vehicles, setVehicles, setvehiclesTable }) => {
   const [vehicleAAdd, setvehicleAAdd] = useState({});
   const [rowsTable, setRowsTable] = useState([]);
 
   useEffect(() => {
     console.log(vehicleAAdd);
   }, [vehicleAAdd]);
+
   useEffect(() => {
     console.log("rowsTable", rowsTable);
-  }, [rowsTable]);
+    setvehiclesTable(rowsTable);
+  }, [rowsTable, setvehiclesTable]);
 
   const addNewVehicle = () => {
     setRowsTable([...rowsTable, vehicleAAdd]);
-    setVehicles(vehicles.filter((v) =>v._id !== vehicleAAdd._id));
+    setVehicles(vehicles.filter((v) => v._id !== vehicleAAdd._id));
     setvehicleAAdd({});
   };
 
@@ -158,11 +201,13 @@ const VehiclesTable = ({ vehicles, setVehicles }) => {
             <th>Name</th>
             <th>Brand</th>
             <th>Model</th>
-            <th>Delete</th>
+            <th>Quantity</th>
+            <th>Eliminar</th>
+            <th className="hidden">Input</th>
           </tr>
         </thead>
         <tbody>
-          {rowsTable.map((el) => {
+          {rowsTable.map((el, index) => {
             return (
               <tr key={nanoid()}>
                 <td>{el._id}</td>
@@ -170,11 +215,17 @@ const VehiclesTable = ({ vehicles, setVehicles }) => {
                 <td>{el.brand}</td>
                 <td>{el.model}</td>
                 <td>
+                  <label htmlFor={`value_${index}`}>
+                    <input type="number" name={`quantity_${index}`} />
+                  </label>
+                </td>
+                <td>
                   <i
                     onClick={() => deleteVehicle(el)}
                     className="fas fa-minus text-red-500 cursor-pointer"
                   />
                 </td>
+                <input hidden defaultValue={el._id} name={`vehicle_${index}`} />
               </tr>
             );
           })}
@@ -183,4 +234,5 @@ const VehiclesTable = ({ vehicles, setVehicles }) => {
     </div>
   );
 };
+
 export default Sales;
