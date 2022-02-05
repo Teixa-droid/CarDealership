@@ -8,7 +8,6 @@ const Sales = () => {
   const form = useRef(null);
   const [sellers, setSellers] = useState([]);
   const [vehicles, setVehicles] = useState([]);
-  const [vehiclesSelected, setVehiclesSelected] = useState([]);
 
   useEffect(() => {
     const fetchSellers = async () => {
@@ -37,13 +36,7 @@ const Sales = () => {
     fetchVehicles();
   }, []);
 
-  useEffect(() => {
-    console.log("selected vehicles", vehiclesSelected);
-  }, [vehiclesSelected]);
 
-  const addNewVehicle = () => {
-    setVehiclesSelected([...vehiclesSelected, DropDownVehicles]);
-  };
 
   const submitForm = async (e) => {
     e.preventDefault();
@@ -62,7 +55,7 @@ const Sales = () => {
     <div className="flex h-full w-full items-center justify-center">
       <form ref={form} onSubmit={submitForm} className="flex flex-col h-full">
         <h1 className="text-3xl font-extrabold text-gray-900 my-3">
-          Crear una nueva venta
+          Create a new sale
         </h1>
         <label className="flex flex-col" htmlFor="seller">
           <span className="text-2xl font-gray-900">Seller</span>
@@ -80,29 +73,8 @@ const Sales = () => {
             })}
           </select>
         </label>
-        <div className="flex flex-col">
-          <span>Seleccion de Vehicles</span>
-          <button
-            type="button"
-            onClick={() => addNewVehicle()}
-            className="col-span-2 bg-green-400 p-2 rounded-full shadow-md hover:bg-green-600 text-white"
-          >
-            agregar nuevo vehiculo
-          </button>
-        </div>
 
-        {vehiclesSelected.map((DropDownVehicle, index) => {
-          return (
-            <div className="flex">
-              <DropDownVehicle
-                key={nanoid()}
-                vehicles={vehicles}
-                name={`vehicle_${index}`}
-              />
-            </div>
-          );
-        })}
-
+        <VehiclesTable vehicles={vehicles} setVehicles={setVehicles}/>
         <label className="flex flex-col">
           <span className="text-2xl font-gray-900">Valor Total Venta</span>
           <input
@@ -116,32 +88,99 @@ const Sales = () => {
           type="submit"
           className="col-span-2 bg-green-400 p-2 rounded-full shadow-md hover:bg-green-600 text-white"
         >
-          Crear Venta
+          Create Sale
         </button>
       </form>
     </div>
   );
 };
 
-const DropDownVehicles = ({ vehicles, name }) => {
+const VehiclesTable = ({ vehicles, setVehicles }) => {
+  const [vehicleAAdd, setvehicleAAdd] = useState({});
+  const [rowsTable, setRowsTable] = useState([]);
+
+  useEffect(() => {
+    console.log(vehicleAAdd);
+  }, [vehicleAAdd]);
+  useEffect(() => {
+    console.log("rowsTable", rowsTable);
+  }, [rowsTable]);
+
+  const addNewVehicle = () => {
+    setRowsTable([...rowsTable, vehicleAAdd]);
+    setVehicles(vehicles.filter((v) =>v._id !== vehicleAAdd._id));
+    setvehicleAAdd({});
+  };
+
+  const deleteVehicle = (vehicleToBeDeleted) => {
+    setRowsTable(rowsTable.filter((v) => v._id !== vehicleToBeDeleted._id));
+    setVehicles([...vehicles, vehicleToBeDeleted]);
+  };
+
   return (
-    <label className="flex flex-col" htmlFor="vehiculo">
-      <span className="text-2xl font-gray-900">Vehicle</span>
-      <select name={name} className="p-2" defaultValue={-1}>
-        <option disabled value={-1}>
-          Seleccione un Vehicle
-        </option>
-        {vehicles.map((el) => {
-          return (
-            <option
-              key={nanoid()}
-              value={el._id}
-            >{`${el.name} ${el.brand} ${el.model}`}</option>
-          );
-        })}
-      </select>
-    </label>
+    <div>
+      <div className="flex ">
+        <label className="flex flex-col" htmlFor="vehicle">
+          <select
+            className="p-2"
+            value={vehicleAAdd._id ?? ""}
+            onChange={(e) =>
+              setvehicleAAdd(
+                vehicles.filter((v) => v._id === e.target.value)[0]
+              )
+            }
+          >
+            <option disabled value="">
+              Select a Vehicle
+            </option>
+            {vehicles.map((el) => {
+              return (
+                <option
+                  key={nanoid()}
+                  value={el._id}
+                >{`${el.name} ${el.brand} ${el.model}`}</option>
+              );
+            })}
+          </select>
+        </label>
+        <button
+          type="button"
+          onClick={() => addNewVehicle()}
+          className="col-span-2 bg-green-400 p-2 rounded-full shadow-md hover:bg-green-600 text-white"
+        >
+          add new vehicle
+        </button>
+      </div>
+      <table className="table">
+        <thead>
+          <tr>
+            <th>Id</th>
+            <th>Name</th>
+            <th>Brand</th>
+            <th>Model</th>
+            <th>Delete</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rowsTable.map((el) => {
+            return (
+              <tr key={nanoid()}>
+                <td>{el._id}</td>
+                <td>{el.name}</td>
+                <td>{el.brand}</td>
+                <td>{el.model}</td>
+                <td>
+                  <i
+                    onClick={() => deleteVehicle(el)}
+                    className="fas fa-minus text-red-500 cursor-pointer"
+                  />
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
   );
 };
-
 export default Sales;
