@@ -6,8 +6,9 @@ import {
   getVehicles,
   createVehicle,
   editVehicle,
-  removeVehicle
+  removeVehicle,
 } from "utils/api";
+import ReactLoading from "react-loading";
 import "react-toastify/dist/ReactToastify.css";
 
 const Vehicles = () => {
@@ -16,19 +17,25 @@ const Vehicles = () => {
   const [buttonText, setButtonText] = useState("Create new vehicle");
   const [colorButton, setColorButton] = useState("indigo");
   const [executeQuery, setExecuteQuery] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    console.log("query", executeQuery);
-    if (executeQuery) {
-      getVehicles(
+    const fethVehicles = async (vehicles) => {
+      setLoading(true);
+      await getVehicles(
         (response) => {
           setVehicles(response.data);
+          setExecuteQuery(false);
+          setLoading(false);
         },
         (error) => {
           console.log(error);
         }
       );
-      setExecuteQuery(false);
+    };
+    console.log("get", getVehicles);
+    if (getVehicles) {
+      fethVehicles();
     }
   }, [executeQuery]);
 
@@ -64,6 +71,7 @@ const Vehicles = () => {
       </div>
       {showTable ? (
         <VehiclesTable
+          loading={loading}
           vehiclesList={vehicles}
           setExecuteQuery={setExecuteQuery}
         />
@@ -79,7 +87,7 @@ const Vehicles = () => {
   );
 };
 
-const VehiclesTable = ({ vehiclesList, setExecuteQuery }) => {
+const VehiclesTable = ({ loading, vehiclesList, setExecuteQuery }) => {
   const [search, setSearch] = useState("");
   const [filteredVehicles, setFilteredVehicles] = useState(vehiclesList);
 
@@ -103,28 +111,32 @@ const VehiclesTable = ({ vehiclesList, setExecuteQuery }) => {
       />
       <h2 className="text-2xl font-extrabold text-gray-800">All vehicles</h2>
       <div className="hidden md:flex w-full">
-        <table className="table">
-          <thead>
-            <tr>
-              <th>Id</th>
-              <th>Vehicle Name</th>
-              <th>Car Brand</th>
-              <th>Car Model</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredVehicles.map((vehicle) => {
-              return (
-                <VehicleQueue
-                  key={nanoid()}
-                  vehicle={vehicle}
-                  setExecuteQuery={setExecuteQuery}
-                />
-              );
-            })}
-          </tbody>
-        </table>
+        {loading ? (
+          <ReactLoading type="cylon" color="#abc123" height={667} width={375} />
+        ) : (
+          <table className="table">
+            <thead>
+              <tr>
+                <th>Id</th>
+                <th>Vehicle Name</th>
+                <th>Car Brand</th>
+                <th>Car Model</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredVehicles.map((vehicle) => {
+                return (
+                  <VehicleQueue
+                    key={nanoid()}
+                    vehicle={vehicle}
+                    setExecuteQuery={setExecuteQuery}
+                  />
+                );
+              })}
+            </tbody>
+          </table>
+        )}
       </div>
       <div className="flex flex-col w-full m-2 md:hidden">
         {filteredVehicles.map((el) => {
