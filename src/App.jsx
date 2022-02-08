@@ -14,7 +14,7 @@ import Sales from "pages/admin/Sales";
 import { Auth0Provider } from "@auth0/auth0-react";
 import Users from "pages/admin/Users";
 import { UserContext } from "context/userContext";
-
+import PrivateRoute from "components/PrivateRoute";
 function App() {
   const [darkMode, setDarkMode] = useState(false);
   const [userData, setUserData] = useState({});
@@ -45,13 +45,19 @@ function App() {
                   <PrivateLayout>
                     <Switch>
                       <Route path="/admin/vehicles">
-                        <Vehicles />
+                        <PrivateRoute rolList={["admin"]}>
+                          <Vehicles />
+                        </PrivateRoute>
                       </Route>
                       <Route path="/admin/sales">
-                        <Sales />
+                        <PrivateRoute rolList={["admin"]}>
+                          <Sales />
+                        </PrivateRoute>
                       </Route>
                       <Route path="/admin/users">
-                        <Users />
+                        <PrivateRoute rolList={["admin", "seller"]}>
+                          <Users />
+                        </PrivateRoute>
                       </Route>
                       <Route path="/admin">
                         <Admin />

@@ -3,6 +3,7 @@ import LogoImage from "./LogoImage";
 import { Link } from "react-router-dom";
 import useActiveRoute from "hooks/useActiveRoute";
 import { useAuth0 } from "@auth0/auth0-react";
+import PrivateComponent from "./PrivateComponent";
 
 const Sidebar = () => {
   const { user, logout } = useAuth0();
@@ -17,9 +18,15 @@ const Sidebar = () => {
       </Link>
       <div className="my-4">
         <Rota icon="fas fa-user" rota="/admin/profile" name="Profile" user={user} />
+        <PrivateComponent rolList={["admin", "seller"]}> 
         <Rota icon="fas fa-car" rota="/admin/vehicles" name="Vehicles" />
+        </PrivateComponent>
+        <PrivateComponent rolList={["admin"]}>         
         <Rota icon="fas fa-cash-register" rota="/admin/sales" name="Sales" />
+        </PrivateComponent>
+        <PrivateComponent rolList={["admin"]}> 
         <Rota icon="fas fa-users" rota="/admin/users" name="Users" />
+        </PrivateComponent>
       </div>
       <button onClick={() => logOff()}>
         Exit

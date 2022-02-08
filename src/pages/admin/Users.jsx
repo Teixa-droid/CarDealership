@@ -29,12 +29,23 @@ const Users = () => {
         <button className="bg-red-400">ola</button>
       </PrivateComponent>
       <table className="table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Status</th>
+            <th>Rol</th>
+          </tr>
+        </thead>
         <tbody>
           {users.map((user) => {
             return (
               <tr key={nanoid()}>
                 <td>{user.name}</td>
                 <td>{user.email}</td>
+                <td>
+                  <StateUser user={user} />
+                </td>
                 <td>
                   <UserRols user={user} />
                 </td>
@@ -70,9 +81,51 @@ const UserRols = ({ user }) => {
 
   return (
     <select value={rol} onChange={(e) => setRol(e.target.value)}>
+      <option value="" disabled>
+        Select rol
+      </option>
       <option value="admin">Admin</option>
       <option value="seller">Seller</option>
-      <option value="inactive">Inactive</option>
+      <option value="no rol">No rol</option>
+    </select>
+  );
+};
+
+const StateUser = ({ user }) => {
+  const [state, setState] = useState(user.state ?? "");
+
+  useEffect(() => {
+    const edittUser = async () => {
+      await editUser(
+        user._id,
+        { state },
+        (res) => {
+          console.log(res);
+        },
+        (err) => {
+          console.error(err);
+        }
+      );
+    };
+    if (user.state !== state) {
+      edittUser();
+    }
+  }, [state, user]);
+
+  return (
+    <select value={state} onChange={(e) => setState(e.target.value)}>
+      <option value="" disabled>
+        Select state
+      </option>
+      <option value="authorized" className="text-green-500">
+        Authorized
+      </option>
+      <option value="pending" className="text-yellow-500">
+        Pending
+      </option>
+      <option value="rejected" className="text-red-500">
+        Rejected
+      </option>
     </select>
   );
 };
