@@ -29,14 +29,14 @@ const PrivateLayout = ({ children }) => {
         (err) => {
           console.log("err", err);
           setLoadingUserInformation(false);
-          logout({ returnTo: 'http://localhost:3000/admin' });
+          logout({ returnTo: "http://localhost:3000/admin" });
         }
       );
     };
     if (isAuthenticated) {
       fetchAuth0Token();
     }
-  }, [isAuthenticated, getAccessTokenSilently]);
+  }, [isAuthenticated, getAccessTokenSilently, logout, setUserData]);
 
   
   if (isLoading || loadingUserInformation)
