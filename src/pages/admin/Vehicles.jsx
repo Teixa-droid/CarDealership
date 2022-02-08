@@ -10,6 +10,7 @@ import {
 } from "utils/api";
 import ReactLoading from "react-loading";
 import "react-toastify/dist/ReactToastify.css";
+import PrivateComponent from "components/PrivateComponent";
 
 const Vehicles = () => {
   const [showTable, setshowTable] = useState(true);
@@ -121,7 +122,9 @@ const VehiclesTable = ({ loading, vehiclesList, setExecuteQuery }) => {
                 <th>Vehicle Name</th>
                 <th>Car Brand</th>
                 <th>Car Model</th>
+                <PrivateComponent rolList={['admin']}> 
                 <th>Actions</th>
+                </PrivateComponent>
               </tr>
             </thead>
             <tbody>
@@ -253,62 +256,64 @@ const VehicleQueue = ({ vehicle, setExecuteQuery }) => {
           <td>{vehicle.model}</td>
         </>
       )}
-      <td>
-        <div className="flex w-full justify-around">
-          {edit ? (
-            <>
-              <Tooltip title="Confirmar Edición" arrow>
-                <i
-                  onClick={() => updataVehicle()}
-                  className="fas fa-check text-green-700 hover:text-green-500"
-                />
-              </Tooltip>
-              <Tooltip title="Cancelar edición" arrow>
-                <i
-                  onClick={() => setEdit(!edit)}
-                  className="fas fa-ban text-yellow-700 hover:text-yellow-500"
-                />
-              </Tooltip>
-            </>
-          ) : (
-            <>
-              <Tooltip title="Editar Vehículo" arrow>
-                <i
-                  onClick={() => setEdit(!edit)}
-                  className="fas fa-pencil-alt text-yellow-700 hover:text-yellow-500"
-                />
-              </Tooltip>
-              <Tooltip title="Eliminar Vehículo" arrow>
-                <i
-                  onClick={() => setOpenDialog(true)}
-                  className="fas fa-trash text-red-700 hover:text-red-500"
-                />
-              </Tooltip>
-            </>
-          )}
-        </div>
-        <Dialog open={openDialog}>
-          <div className="p-8 flex flex-col">
-            <h1 className="text-gray-900 text-2xl font-bold">
-              Are you sure you want to remove the vehicle?
-            </h1>
-            <div className="flex w-full items-center justify-center my-4">
-              <button
-                onClick={() => deleteVehicle()}
-                className="mx-2 px-4 py-2 bg-green-500 text-white hover:bg-green-700 rounded-md shadow-md"
-              >
-                Yes
-              </button>
-              <button
-                onClick={() => setOpenDialog(false)}
-                className="mx-2 px-4 py-2 bg-red-500 text-white hover:bg-red-700 rounded-md shadow-md"
-              >
-                No
-              </button>
-            </div>
+      <PrivateComponent rolList={["admin"]}>
+        <td>
+          <div className="flex w-full justify-around">
+            {edit ? (
+              <>
+                <Tooltip title="Confirmar Edición" arrow>
+                  <i
+                    onClick={() => updataVehicle()}
+                    className="fas fa-check text-green-700 hover:text-green-500"
+                  />
+                </Tooltip>
+                <Tooltip title="Cancelar edición" arrow>
+                  <i
+                    onClick={() => setEdit(!edit)}
+                    className="fas fa-ban text-yellow-700 hover:text-yellow-500"
+                  />
+                </Tooltip>
+              </>
+            ) : (
+              <>
+                <Tooltip title="Editar Vehículo" arrow>
+                  <i
+                    onClick={() => setEdit(!edit)}
+                    className="fas fa-pencil-alt text-yellow-700 hover:text-yellow-500"
+                  />
+                </Tooltip>
+                <Tooltip title="Eliminar Vehículo" arrow>
+                  <i
+                    onClick={() => setOpenDialog(true)}
+                    className="fas fa-trash text-red-700 hover:text-red-500"
+                  />
+                </Tooltip>
+              </>
+            )}
           </div>
-        </Dialog>
-      </td>
+          <Dialog open={openDialog}>
+            <div className="p-8 flex flex-col">
+              <h1 className="text-gray-900 text-2xl font-bold">
+                Are you sure you want to remove the vehicle?
+              </h1>
+              <div className="flex w-full items-center justify-center my-4">
+                <button
+                  onClick={() => deleteVehicle()}
+                  className="mx-2 px-4 py-2 bg-green-500 text-white hover:bg-green-700 rounded-md shadow-md"
+                >
+                  Yes
+                </button>
+                <button
+                  onClick={() => setOpenDialog(false)}
+                  className="mx-2 px-4 py-2 bg-red-500 text-white hover:bg-red-700 rounded-md shadow-md"
+                >
+                  No
+                </button>
+              </div>
+            </div>
+          </Dialog>
+        </td>
+      </PrivateComponent>
     </tr>
   );
 };

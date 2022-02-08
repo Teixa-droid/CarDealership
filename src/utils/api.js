@@ -54,6 +54,31 @@ export const getUsers = async (successCallback, errorCallback) => {
   };
   await axios.request(options).then(successCallback).catch(errorCallback);
 };
+export const getUserData = async (successCallback, errorCallback) => {
+  const options = {
+    method: "GET",
+    url: "http://localhost:5000/users/self",
+    headers: {
+      Authorization: getToken(), // 3. enviarle el token a backend
+    },
+  };
+  await axios.request(options).then(successCallback).catch(errorCallback);
+};
+
+export const editUser = async (
+  id,
+  data,
+  successCallback,
+  errorCallback
+) => {
+  const options = {
+    method: "PATCH",
+    url: `http://localhost:5000/users/${id}/`,
+    headers: { "Content-Type": "application/json", Authorization: getToken() },
+    data,
+  };
+  await axios.request(options).then(successCallback).catch(errorCallback);
+};
 
 export const createSaller = async (data, successCallback, errorCallback) => {
   const options = {
